@@ -3,6 +3,7 @@ from Question import Question
 questions_file = "../questions.txt"
 answers_file = "../answers.txt"
 DOCS = "../docs/"
+output_file = "../output.txt"
 
 # extracts data from questions file...
 def extract_questions(questions_file):
@@ -44,10 +45,19 @@ def main():
     questions = extract_questions(questions_file)
     answers = extract_answers(answers_file)
     score = 0.0
+    output = open(output_file,"w")
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
         question = Question(qNumber,questions[qNumber],docs)
-        guess = question.run_baseline()
+        guesses = question.run_baseline()
+        for (_,doc,guess) in guesses:
+            if not doc or not guess:
+                doc = "nil"
+                guess = "nil"
+            output.write(str(qNumber) + " " + doc + " " + guess + "\n")
+            print (str(qNumber) + " " + doc + " " + guess)
+    output.close()
+    '''
         if answers[qNumber].lower() in guess.lower():
             score +=1
             print "got one!"
@@ -57,6 +67,7 @@ def main():
     accuracy = score / len(questions)
     print "Correct Guesses: " + str(score)
     print "Accuracy: " + str(accuracy)
+    '''
 
 if __name__ == '__main__':
     main()

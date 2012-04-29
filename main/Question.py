@@ -27,10 +27,10 @@ class Question():
         
     def run_baseline(self):
         q_tokens = word_tokenize(self.desc)[:-1] #remove "?"
-        best_match = []
-        best_score = 0
+        best_matches = [(0,"","")]*5
         tokens = []
         count = 0
+        currentDoc = ""
         for line in self.docs:
             count += 1
             if count > 1000: #gets thru over 10 documents
@@ -43,13 +43,25 @@ class Question():
             else:
                 input = tokens
                 tokens = []
+            try:
+                doc_index = input.index("DOCNO")
+                currentDoc = input[doc_index+2]
+            except ValueError: #"<DOCNO>" not in group
+                pass
+            except IndexError: #<DOCNO> at end of group
+                if input.index("DOCNO") == 8:
+                    currentDoc = tokens[0]
+                else:
+                    currentDoc = tokens[1]
             score = 0
             for q_token in q_tokens:
                 if q_token in input:
                     score += 1
-            if score > best_score:
-                best_score = score
-                best_match = input
-        return ' '.join(best_match)
+            for i in range(len(best_matches)):
+                (top_score,doc,txt) = best_matches[i]
+                if score > top_score:
+                    best_matches[i] = (score,currentDoc,' '.join(input))
+                    break
+        return best_matches
         #return "Aleksei A. Leonov was the first dude"
             

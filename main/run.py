@@ -39,6 +39,11 @@ def extract_answers(answers_file):
         elif not answer_in:
             answers[qNumber] = line[:-1]
     return answers
+
+def extract_documents(filename):
+    with open(filename) as fp:
+        text = fp.read()
+    return text.split('\n')
     
 def main():
     questions = extract_questions(questions_file)

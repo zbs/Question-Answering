@@ -127,7 +127,9 @@ def buildNGrams(wordList, n):
     gramList = []
     for i in range(len(wordList)-n+1):
         gram = wordList[i : i+n]
-        gramList.append(gram)
+        # Convert list to string
+        gramStr = reduce(lambda x,y: x+y+" ", gram, "").rstrip(" ")
+        gramList.append(gramStr)
     return gramList
 
 def countNGrams(ngrams, countDict):
@@ -138,6 +140,14 @@ def countNGrams(ngrams, countDict):
         if ng in countDict:
             total += countDict[ng]
     return total
+
+def listToString(tagSeq):
+    """ Input: a list of strings
+    Output: a string of words separated by spaces """
+    tagString = ""
+    for t in tagSeq:
+        tagString += t + " "
+    return tagString.rstrip(" ")
 
 def getNGramOverlap(question, passages, n):
     """ THIS IS A MAIN METHOD
@@ -150,6 +160,7 @@ def getNGramOverlap(question, passages, n):
     for p in passages:
         words = p.split(" ")
         grams = buildNGrams(words, n)
+        print grams
         count = countNGrams(grams, questionDict)
         overlapList.append(count)
     return overlapList

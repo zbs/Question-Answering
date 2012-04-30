@@ -65,11 +65,15 @@ def findProximity(keywords, passage):
     lst = passage.split(" ")
     keywords.sort()
     wordIndices = {}
+    numWords = 0
     totalDistance = 0
     allDistances = {}
     for i in range(len(lst)):
         w = lst[i]
         if w in keywords:
+            # Count the number of different keywords in the passage
+            if not w in wordIndices:
+                numWords += 1
             wordIndices[w] = i
     # Find distance of all keywords from each other
     for i in range(len(keywords)-1):
@@ -83,7 +87,7 @@ def findProximity(keywords, passage):
                     distance = abs(pos1 - pos2)
                     totalDistance += distance
                     allDistances[w1+" "+w2] = distance
-    return (totalDistance, allDistances)
+    return (numWords, totalDistance, allDistances)
 
 def findAllProximities(keywords, passages):
     """ THIS IS A MAIN METHOD
@@ -92,8 +96,8 @@ def findAllProximities(keywords, passages):
     <number of keywords that appeared in the passage>,<total distance> """
     proximityList = []
     for p in passages:
-        (totalDistance, allDistances) = findProximity(keywords, p)
-        proximityList.append((len(allDistances), totalDistance))
+        (numWords, totalDistance, allDistances) = findProximity(keywords, p)
+        proximityList.append((numWords, totalDistance))
     return proximityList
 
 def getTagSequenceCounts(tagList, n):

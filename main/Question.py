@@ -10,6 +10,7 @@ class Question():
         self.desc_ne_chunks = self.ne_extraction(self.desc)
         self.docs = gzip.open(docs)
         self.db_directory = "../db/db" + str(number)
+        self.index_documents()
 
     def get_keywords(self):
         pass
@@ -41,6 +42,7 @@ class Question():
             database.add_document(doc)
     
     #search the IR database, returns a xapian mset
+    #For query syntax: http://xapian.org/docs/queryparser.html
     #bgj9
     def search(self, query_string):
         # Open the database for searching.

@@ -44,7 +44,7 @@ def extract_answers(answers_file):
 def extract_documents(filename):
     with open(filename) as fp:
         text = fp.read()
-    return text.split('\n')
+    return text.split('\n\n')
     
 def main():
     questions = extract_questions(questions_file)

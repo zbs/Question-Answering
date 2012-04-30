@@ -91,7 +91,13 @@ class Question():
     
     # Implement soon
     def exact_sequence_rank(self, passages):
-        pass
+        sequences = []
+        fragments = self.desc.split(' ')
+        for i in range(0, len(fragments)+1):
+            for j in range(i, len(fragments)):
+                sequences.append(fragments[i:j])
+        return map(lambda x: len([y for y in sequences if x.find(' '.join(y)) != -1]), passages)
+            
     
     # All punctuation should be separated by a space from the word 
     # it was attached to

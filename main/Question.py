@@ -7,6 +7,7 @@ class Question():
         self.desc = desc
         self.docs = gzip.open(docs)
         self.db_directory = "../db/db" + str(number)
+        self.index_documents()
 
     def get_keywords(self):
         pass
@@ -38,6 +39,7 @@ class Question():
             database.add_document(doc)
     
     #search the IR database, returns a xapian mset
+    #For query syntax: http://xapian.org/docs/queryparser.html
     #bgj9
     def search(self, query_string):
         # Open the database for searching.

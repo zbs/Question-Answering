@@ -1,5 +1,6 @@
 import nltk
 from nltk.corpus import wordnet as wn
+import Question
 
 
 def buildQuery(query, hyponyms=True, hypernyms=True):
@@ -52,6 +53,42 @@ def addCategory(synList, lemma, hyponym=True):
         if not word in synList:
             synList.append(word)
     return synList
+
+def getQuestions():
+    """ Builds a list of questions formatted as (docNumber, question text) """
+    f = open("../questions.txt")
+    text = f.readlines()
+    f.close()
+    questions = []
+    docNumber = -1
+    qText = ""
+    for i in range(len(text)):
+        if text[i][0:5] == "<num>":
+            num = int(text[i].rstrip("\n").split(" ")[2])
+        elif text[i][0:6] == "<desc>":
+            qText = text[i+1].rstrip("\n").rstrip("?")
+            questions.append((num, qText))
+    return questions
+
+def getKeyWords(question, stopWords):
+    words = question.split(" ")
+    keywords = []
+    for w in words:
+        if not w in stopWords:
+            keywords.append(w)
+    return keywords
+
+def getStopWords():
+    f = open("../stopWords.txt")
+    words = f.readlines()
+    f.close()
+    words = map(lambda x: x.rstrip("\n"), words)
+    s = set()
+    for w in words:
+        s.add(w)
+    return s
+            
+
 
 ################### Question Formatting Stuff Below (Declan) ##########
 

@@ -3,7 +3,7 @@ from nltk.corpus import wordnet as wn
 import Question
 
 
-def buildQuery(query, hyponyms=True, hypernyms=True):
+def buildSynset(query, hyponyms=True, hypernyms=True):
     """ Input: the query string.
     Output: list of words
     Gets the part of speech of words in the query then finds synsets for 
@@ -87,7 +87,26 @@ def getStopWords():
     for w in words:
         s.add(w)
     return s
+
+def buildQueries():
+    stopWords = getStopWords()
+    questions = getQuestions()
+    fullQuestions = []
+    for i in range(len(questions)):
+        num, q = questions[i]
+        kw = getKeyWords(q, stopWords)
+        kwString = " ".join(kw)
+        fullQuestions.append((num, q+" "+kwString))
+    """
+    for (num, q) in questions:
+        synset = buildSynset(q, hyponyms=False)
+        synString = " ".join(synset)
+        fullQuestions.append((num, q+" "+synString))
+    """
+    return fullQuestions    
             
+def askQuestions():
+    questions = buildQueries()
 
 
 ################### Question Formatting Stuff Below (Declan) ##########

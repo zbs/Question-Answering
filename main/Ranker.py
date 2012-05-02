@@ -95,9 +95,13 @@ def findAllProximities(keywords, passages):
     formatted as strings. Output: a list of tuples of
     <number of keywords that appeared in the passage>,<total distance> """
     proximityList = []
+    # Constants for score. A larger top will put more weight on the number
+    # of overlapping words. A larger bottom will put more weight on the distance
+    top = 1.0
+    bottom = 1.0
     for p in passages:
         (numWords, totalDistance, allDistances) = findProximity(keywords, p)
-        proximityList.append((numWords, totalDistance))
+        proximityList.append((numWords*top) / (totalDistance*bottom))
     return proximityList
 
 def getTagSequenceCounts(tagList, n):

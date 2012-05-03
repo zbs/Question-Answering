@@ -105,7 +105,11 @@ def main():
         query = questions[qNumber]
         synset = BuildQuery.buildSynset(query, hyponyms=True, hypernyms=False)
         synset = BuildQuery.trimSynset(query, synset)
-        documents = question.
+        query += " ".join(synset)
+        documents = question.search(query)
+        print len(documents)
+        print documents[1]
+        return documents
         """
         guesses = question.run_baseline()
         for (_,doc,guess) in guesses:

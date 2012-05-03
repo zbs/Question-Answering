@@ -107,5 +107,5 @@ def buildQueries():
             
 def askQuestions():
     questions = buildQueries()
-
+    
 

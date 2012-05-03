@@ -1,6 +1,7 @@
 import gzip, xapian, re
 from nltk import word_tokenize, pos_tag, ne_chunk
 from xml.dom import minidom
+import Ranker
 
 class Question():
     def __init__(self,number,desc,docs):
@@ -8,7 +9,7 @@ class Question():
         self.desc = desc
         
         # This needs to be initialized correctly
-        self.desc_ne_chunks = self.ne_extract(self.desc)
+        self.desc_ne_chunks = Ranker.ne_extract(self.desc)
         self.docs = gzip.open(docs)
         self.db_directory = "../db/db" + str(number)
         self.index_documents()

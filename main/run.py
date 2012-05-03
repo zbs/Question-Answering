@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 from Question import Question
+import BuildQuery
 
 questions_file = "../questions.txt"
 answers_file = "../answers.txt"
@@ -99,6 +100,13 @@ def main():
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
         question = Question(qNumber,questions[qNumber],docs)
+        # Can do baseline here or do full process.
+        # Get expanded question:
+        query = questions[qNumber]
+        synset = BuildQuery.buildSynset(query, hyponyms=True, hypernyms=False)
+        synset = BuildQuery.trimSynset(query, synset)
+        documents = question.
+        """
         guesses = question.run_baseline()
         for (_,doc,guess) in guesses:
             if not doc or not guess:
@@ -106,6 +114,7 @@ def main():
                 guess = "nil"
             output.write(str(qNumber) + " " + doc + " " + guess + "\n")
             print (str(qNumber) + " " + doc + " " + guess)
+        """
     output.close()
     mrr = MRR(answers_file, output_file)
     print "MRR: " + str(mrr)

@@ -79,6 +79,7 @@ class Question():
     
     #search the IR database, returns a xapian mset
     #For query syntax: http://xapian.org/docs/queryparser.html
+    #returns [(percent, doc_string)]
     #bgj9
     def search(self, query_string):
         # Open the database for searching.
@@ -104,11 +105,28 @@ class Question():
         # Display the results.
         print "%i results found." % matches.get_matches_estimated()
         print "Results 1-%i:" % matches.size()
-    
         #for m in matches:
         #    print "%i: %i%% docid=%i [%s]" % (m.rank + 1, m.percent, m.docid, m.document.get_data())
-        return matches
+        results = []
+        for m in matches:
+            results.append( (m.percent, m.document.get_data()) )
+        return results
 
+    
+    def intersection_length(self, list1, list2):
+        return len(set(list1)&set(list2))
+
+    def string_intersection_length(self, str1, str2):
+        return self.intersection_length(str1.split(' '), str2.split(' '))
+    
+    def ne_extraction(self, text):
+        tags = pos_tag(text.split(' '))
+        return ne_chunk(tags)
+        
+    def NE_rank(self, passages, named_entities):
+        return map(self.intersection_length, map(self.ne_extraction, passages), \
+                   [self.desc_ne_chunks] * len(passages))
+    
     def extract_documents(self):
         query = self.get_query()
         return self.run_IR()

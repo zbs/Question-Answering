@@ -105,7 +105,11 @@ def buildQueries():
     """
     return fullQuestions    
             
-def askQuestions():
-    questions = buildQueries()
+def trimSynset(query, synset):
+    """ Removes overlap between query and synset """
+    for s in synset:
+        if s in query:
+            synset.remove(s)
+    return synset
     
 

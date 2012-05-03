@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 from Question import Question
 
 questions_file = "../questions.txt"

@@ -101,7 +101,10 @@ def findAllProximities(keywords, passages):
     bottom = 1.0
     for p in passages:
         (numWords, totalDistance, allDistances) = findProximity(keywords, p)
-        proximityList.append((numWords*top) / (totalDistance*bottom))
+        if numWords != 0:
+            proximityList.append((numWords*top) / (totalDistance*bottom))
+        else:
+            proximityList.append(0.0)
     return proximityList
 
 def getTagSequenceCounts(tagList, n):

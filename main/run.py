@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 from Question import Question
 
 questions_file = "../questions.txt"
@@ -45,7 +47,50 @@ def extract_documents(filename):
     with open(filename) as fp:
         text = fp.read()
     return text.split('\n\n')
+
+def MRR(answers_file, output_file):
+    """
+    Computes the Mean Reciprocal Rank of the output_file
+    """
+    answers = extract_answers(answers_file)
+    currentQuestion = -1
+    lastQuestionAnswered = -1
+    numQuestions = 0
+    currentRank = 1
+    score = 0.0
     
+    output = open(output_file)
+    for line in output.readlines():
+        pieces = line.split(" ")
+        qNumber = int(pieces[0])
+        document = pieces[1]
+        guess = " ".join(pieces[2:])
+        
+        #reset rank if this is a new qNumber
+        #also increment the number of questions
+        if currentQuestion != qNumber:
+            currentQuestion = qNumber
+            currentRank = 1
+            numQuestions += 1
+        
+        #skip over this line if this qNumber has already been answered
+        if lastQuestionAnswered == qNumber:
+            continue
+        
+        #add 1/rank to the score if guess contains the answer
+        if answers[qNumber].lower() in guess.lower():
+            print "got one!"
+            print qNumber
+            print answers[qNumber].lower()
+            print guess.lower()
+            score += 1.0/currentRank
+            lastQuestionAnswered = qNumber
+        
+        #increment rank
+        currentRank += 1
+    return score/numQuestions
+        
+
 def main():
     questions = extract_questions(questions_file)
     answers = extract_answers(answers_file)
@@ -62,6 +107,8 @@ def main():
             output.write(str(qNumber) + " " + doc + " " + guess + "\n")
             print (str(qNumber) + " " + doc + " " + guess)
     output.close()
+    mrr = MRR(answers_file, output_file)
+    print "MRR: " + str(mrr)
     '''
         if answers[qNumber].lower() in guess.lower():
             score +=1

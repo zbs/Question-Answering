@@ -1,5 +1,6 @@
-import gzip, xapian
+import gzip, xapian, re
 from nltk import word_tokenize, pos_tag, ne_chunk
+from xml.dom import minidom
 
 class Question():
     def __init__(self,number,desc,docs):
@@ -7,10 +8,44 @@ class Question():
         self.desc = desc
         
         # This needs to be initialized correctly
-        self.desc_ne_chunks = self.ne_extraction(self.desc)
+        self.desc_ne_chunks = self.ne_extract(self.desc)
         self.docs = gzip.open(docs)
         self.db_directory = "../db/db" + str(number)
         self.index_documents()
+
+    def getDocumentRelevantInfo(self):
+        """Returns a list of dictionaries, each dictionary corresponding to a document.
+        The keys of the dictionary are the tags of the document.
+        
+        Example code:
+        docInfoList = self.getDocumentRelevantInfo()
+        for docInfo in docInfoList:
+            entry = docInfo["TEXT"] #assuming text should always be in the document
+            if "LEADPARA" in docInfo:
+                entry += docInfo["LEADPARA"]
+            if "HEADLINE" in docInfo:
+                entry += docInfo["HEADLINE"]
+        """
+        docInfoList = []
+        text = self.docs.read()
+        
+        #documents are not well formed XML! why would the TAs give us badly formed XML?
+        text = "<documents>" + text + "</documents>"
+        #removes tags with attributes such as <F P=100> RUSSIA NATIONAL AFFAIRS </F>
+        text = re.sub("<([a-zA-Z0-9]*) [a-zA-Z0-9= ]*>(.*?)</[a-zA-Z0-9]*>", "", text)
+        dom = minidom.parseString(text)
+        
+        for doc in dom.getElementsByTagName("DOC"):
+            docInfo = {}
+            for child in doc.childNodes:
+                tag = child.nodeName.encode("ascii") #normally unicode string?
+                value = "" 
+                for node in child.childNodes:
+                    value += node.toxml().encode("ascii")
+                docInfo[tag] = value
+            docInfoList.append(docInfo)
+
+        return docInfoList
 
     def get_keywords(self):
         pass
@@ -43,6 +78,7 @@ class Question():
     
     #search the IR database, returns a xapian mset
     #For query syntax: http://xapian.org/docs/queryparser.html
+    #returns [(percent, doc_string)]
     #bgj9
     def search(self, query_string):
         # Open the database for searching.
@@ -70,7 +106,6 @@ class Question():
         print "Results 1-%i:" % matches.size()
         #for m in matches:
         #    print "%i: %i%% docid=%i [%s]" % (m.rank + 1, m.percent, m.docid, m.document.get_data())
-        
         results = []
         for m in matches:
             results.append( (m.percent, m.document.get_data()) )
@@ -90,28 +125,6 @@ class Question():
     def NE_rank(self, passages, named_entities):
         return map(self.intersection_length, map(self.ne_extraction, passages), \
                    [self.desc_ne_chunks] * len(passages))
-    
-
-    def num_keywords_rank(self, passages):
-        return map(self.string_intersection_length , passages, [self.desc]*len(passages))
-    
-    # Implement soon
-    def exact_sequence_rank(self, passages):
-        sequences = []
-        fragments = self.desc.split(' ')
-        for i in range(0, len(fragments)+1):
-            for j in range(i, len(fragments)):
-                sequences.append(fragments[i:j])
-        return map(lambda x: len([y for y in sequences if x.find(' '.join(y)) != -1]), passages)
-            
-    
-    # All punctuation should be separated by a space from the word 
-    # it was attached to
-    def rank_passages(self, passages, named_entities):
-        rankings = zip(self.NE_rank(passages, named_entities), self.num_keywords_rank(passages), \
-                       self.exact_sequence_rank(passages), self.document_rank(passages), \
-                       self.proximity_rank(passages), self.ngram_overlap_rank(passages))
-        return map(lambda x: float(sum(x)) / float(len(x)), rankings)
     
     def extract_documents(self):
         query = self.get_query()

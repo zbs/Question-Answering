@@ -185,6 +185,8 @@ class Question():
                     passages.append( (ranking, tokens[i : i+WINDOW]) )
                     i += WINDOW / 2
         return passages
-                    
+    
+    def strip_tags(self, doc_string):
+        return re.sub("<[^<>]+>", "", doc_string)
 #q = Question(227,0,"../docs/top_docs.227.gz")
 #print (q.golden_passage_retriever(q.search("I think that's great!")))

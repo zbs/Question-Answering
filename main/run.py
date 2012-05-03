@@ -45,7 +45,10 @@ def extract_documents(filename):
     with open(filename) as fp:
         text = fp.read()
     return text.split('\n\n')
-    
+
+def extract_passages(documents):
+    pass
+
 def main():
     questions = extract_questions(questions_file)
     answers = extract_answers(answers_file)

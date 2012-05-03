@@ -68,10 +68,14 @@ class Question():
         # Display the results.
         print "%i results found." % matches.get_matches_estimated()
         print "Results 1-%i:" % matches.size()
-    
         #for m in matches:
         #    print "%i: %i%% docid=%i [%s]" % (m.rank + 1, m.percent, m.docid, m.document.get_data())
-        return matches
+        
+        results = []
+        for m in matches:
+            results.append( (m.percent, m.document.get_data()) )
+        return results
+
     
     def intersection_length(self, list1, list2):
         return len(set(list1)&set(list2))

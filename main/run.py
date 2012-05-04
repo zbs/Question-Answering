@@ -49,10 +49,21 @@ def extract_documents(filename):
         text = fp.read()
     return text.split('\n\n')
 
-def extract_passages(documents):
-    pass
-
 def MRR(answers_file, output_file):
+    answers = extract_answers(answers_file)
+    with open(output_file, 'r') as fp:
+        output = fp.read().split('\n')
+    sum_ = 0.
+    for index, answer in enumerate(answers):
+        q_answers = output[index * 6: index*6 + 5]
+        for rank, q_answer in enumerate(q_answers):
+            if q_answer.find(answer):
+                sum_ += 1./float((rank+1))
+                break
+    return sum_ / float(len(answers))
+    
+
+def MRR_(answers_file, output_file):
     """
     Computes the Mean Reciprocal Rank of the output_file
     """

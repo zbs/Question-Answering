@@ -1,6 +1,9 @@
 import gzip, xapian, re
-from nltk import word_tokenize, pos_tag, ne_chunk
+from nltk import word_tokenize, pos_tag, ne_chunk, sent_tokenize
 from xml.dom import minidom
+import Ranker
+
+WINDOW = 10
 
 class Question():
     def __init__(self,number,desc,docs):
@@ -168,4 +171,20 @@ class Question():
                     break
         return best_matches
         #return "Aleksei A. Leonov was the first dude"
-            
+        
+        
+    def golden_passage_retriever( self, ir_results ):
+        passages = []
+        for (ranking, document) in ir_results:
+            for sentence in sent_tokenize(document):
+                tokens = word_tokenize(sentence)
+                i = 0
+                while (i < len(tokens)):
+                    passages.append( (ranking, tokens[i : i+WINDOW]) )
+                    i += WINDOW / 2
+        return passages
+    
+    def strip_tags(self, doc_string):
+        return re.sub("<[^<>]+>", "", doc_string)
+#q = Question(227,0,"../docs/top_docs.227.gz")
+#print (q.golden_passage_retriever(q.search("I think that's great!")))

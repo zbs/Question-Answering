@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
-from Question import Question
-import BuildQuery
+#from Question import Question
+#import BuildQuery
 
 questions_file = "../questions.txt"
 answers_file = "../answers.txt"
@@ -40,8 +40,12 @@ def extract_answers(answers_file):
         if line.startswith("Question"):
             answer_in = 3
             qNumber = int(line.split()[-1])
+            answers[qNumber] = []
+        elif line.startswith("\n"):
+            answer_in = -1
         elif not answer_in:
-            answers[qNumber] = line[:-1]
+            answers[qNumber].append(line[:-1])
+            answer_in = 1
     return answers
 
 def extract_documents(filename):
@@ -104,8 +108,6 @@ def MRR_(answers_file, output_file):
         #increment rank
         currentRank += 1
     return score/numQuestions
-        
->>>>>>> f2a58847db130fae20c9deb7f2757e772c54d112
 
 def main():
     questions = extract_questions(questions_file)
@@ -164,7 +166,6 @@ def checkIR():
             i += 2
             correctDoc = answers[i].rstrip('\n')
             answerDocs.append(correctDoc)
-    numAnswers = len(answerDocs)
     # Check how many questions have the correct document returned
     f = open("../output.txt")
     output = f.readlines()
@@ -172,24 +173,36 @@ def checkIR():
     currentDoc = ""
     currentAnswer = ""
     numCorrect = 0
+    numDocs = 0
+    answersAppear = range(201, 400)
     for i in range(len(output)):
         if "Qid" in output[i][0:9]:
+            numDocs += 1
             qID = output[i].split("\t")[0].split(" ")[1]
-            #qID = output[i][5:8]
             if qID != currentDoc:
-                #currentAnswer = answerDocs.pop(0)
                 currentDoc = qID
+                if int(qID) in answersAppear:
+                    answersAppear.remove(int(qID))
             i += 2
             #print "output is: "
             #print output[i]
             if "</DOCNO>" in output[i]:
                 try:
                     docID = output[i].split(">")[1].split("<")[0].strip(" ")
+                    #print docID
                 except IndexError:
                     print output[i]
             if docID in answerDocs:
                 numCorrect += 1
-    return float(numCorrect) / numAnswers
+    print "There are %d documents in output and %d answerDocs" %(numDocs, len(answerDocs))
+    # How many questions actually have documents returned for them? Hopefully all.
+    # If so, list should be empty.
+    print answersAppear
+    return float(numCorrect) / len(answerDocs)
 
 if __name__ == '__main__':
-    main()
+    #main()
+    print "check"
+    answers = extract_answers(answers_file)
+    for i in answers:
+        print answers[i]

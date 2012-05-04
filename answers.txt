@@ -72,8 +72,7 @@ Question 215
 Who is the leader of India?
 WSJ870608-0089
 Prime Minister Rajiv Gandhi 
-FBIS3-21387
-President Shankar Dayal Sharma OR
+President Shankar Dayal Sharma
 Prime Minister P.V. Narashima Rao
 
 Question 216
@@ -100,7 +99,6 @@ Question 220
 Who is the prime minister of Australia?
 FT923-1450
 Paul Keating
-FBIS4-7115
 Keating
 
 Question 221
@@ -504,7 +502,6 @@ Question 299
 How many types of lemurs are there?
 LA073089-0110
 30 types
-AP881219-0209
 29 species
 
 Question 300
@@ -584,8 +581,6 @@ Question 314
 What is Alice Cooper's real name?
 AP880224-0164
 Vincent Furnier
-AP880225-0005
-Vincent Furnier
 
 Question 315
 Why can't ostriches fly?
@@ -662,7 +657,6 @@ Question 329
 What is the population of Mexico?
 FBIS4-10057
 85.8 million
-WSJ880926-0073
 83.5 million
 
 Question 330
@@ -714,7 +708,6 @@ Question 339
 What was the ball game of ancient Mayans called?
 FT923-9904
 pelota
-LA081489-0062
 sort of hybrid between soccer and basketball
 
 Question 340
@@ -984,7 +977,6 @@ Question 392
 Who was Quetzalcoatl?
 LA081190-0056
 an Aztec god
-SJMN91-06225113
 South American Indian mythical god
 
 Question 393

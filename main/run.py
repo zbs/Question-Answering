@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
-from Question import Question
-import BuildQuery
+#from Question import Question
+#import BuildQuery
 
 questions_file = "../questions.txt"
 answers_file = "../answers.txt"
@@ -40,8 +40,12 @@ def extract_answers(answers_file):
         if line.startswith("Question"):
             answer_in = 3
             qNumber = int(line.split()[-1])
+            answers[qNumber] = []
+        elif line.startswith("\n"):
+            answer_in = -1
         elif not answer_in:
-            answers[qNumber] = line[:-1]
+            answers[qNumber].append(line[:-1])
+            answer_in = 1
     return answers
 
 def extract_documents(filename):
@@ -93,8 +97,7 @@ def MRR(answers_file, output_file):
         #increment rank
         currentRank += 1
     return score/numQuestions
-        
->>>>>>> f2a58847db130fae20c9deb7f2757e772c54d112
+       
 
 def main():
     questions = extract_questions(questions_file)
@@ -181,4 +184,8 @@ def checkIR():
     return float(numCorrect) / numAnswers
 
 if __name__ == '__main__':
-    main()
+    #main()
+    print "check"
+    answers = extract_answers(answers_file)
+    for i in answers:
+        print answers[i]

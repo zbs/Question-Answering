@@ -8,7 +8,6 @@ class Question():
         self.desc = desc
         
         # This needs to be initialized correctly
-        self.desc_ne_chunks = self.ne_extract(self.desc)
         self.docs = gzip.open(docs)
         self.db_directory = "../db/db" + str(number)
         self.index_documents()

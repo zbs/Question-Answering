@@ -97,6 +97,7 @@ def main():
     answers = extract_answers(answers_file)
     score = 0.0
     output = open(output_file,"w")
+    allDocs = []
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
         question = Question(qNumber,questions[qNumber],docs)
@@ -107,9 +108,9 @@ def main():
         synset = BuildQuery.trimSynset(query, synset)
         query += " ".join(synset)
         documents = question.search(query)
-        print len(documents)
-        print documents[1]
-        return documents
+        for (tup, d) in documents:
+            output.write(d)
+        allDocs.append(documents)
         """
         guesses = question.run_baseline()
         for (_,doc,guess) in guesses:
@@ -120,8 +121,9 @@ def main():
             print (str(qNumber) + " " + doc + " " + guess)
         """
     output.close()
-    mrr = MRR(answers_file, output_file)
-    print "MRR: " + str(mrr)
+    #mrr = MRR(answers_file, output_file) Errors in MRR? not working.
+    #print "MRR: " + str(mrr)
+    return allDocs
     '''
         if answers[qNumber].lower() in guess.lower():
             score +=1
@@ -133,6 +135,46 @@ def main():
     print "Correct Guesses: " + str(score)
     print "Accuracy: " + str(accuracy)
     '''
+
+def checkIR():
+    """ Returns proportion of search results that contain the document
+    with the answer according to answers.txt """
+    f = open("../answers.txt")
+    answers = f.readlines()
+    f.close()
+    answerDocs = []
+    # Get correct docs from answer
+    for i in range(len(answers)):
+        if answers[i][0:8] == "Question":
+            i += 2
+            correctDoc = answers[i].rstrip('\n')
+            answerDocs.append(correctDoc)
+    numAnswers = len(answerDocs)
+    # Check how many questions have the correct document returned
+    f = open("../output.txt")
+    output = f.readlines()
+    f.close()
+    currentDoc = ""
+    currentAnswer = ""
+    numCorrect = 0
+    for i in range(len(output)):
+        if "Qid" in output[i][0:9]:
+            qID = output[i].split("\t")[0].split(" ")[1]
+            #qID = output[i][5:8]
+            if qID != currentDoc:
+                #currentAnswer = answerDocs.pop(0)
+                currentDoc = qID
+            i += 2
+            #print "output is: "
+            #print output[i]
+            if "</DOCNO>" in output[i]:
+                try:
+                    docID = output[i].split(">")[1].split("<")[0].strip(" ")
+                except IndexError:
+                    print output[i]
+            if docID in answerDocs:
+                numCorrect += 1
+    return float(numCorrect) / numAnswers
 
 if __name__ == '__main__':
     main()

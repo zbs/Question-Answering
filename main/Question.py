@@ -96,7 +96,7 @@ class Question():
         qp.set_stemming_strategy(xapian.QueryParser.STEM_SOME)
         query = qp.parse_query(query_string)
         #query = qp.parse_query(query_string, xapian.QueryParser.FLAG_AUTO_MULTIWORD_SYNONYMS)
-        print "Parsed query is: %s" % str(query)
+        #print "Parsed query is: %s" % str(query)
     
         # Find the top 10 results for the query.
         enquire.set_query(query)

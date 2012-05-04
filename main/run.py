@@ -49,6 +49,9 @@ def extract_documents(filename):
         text = fp.read()
     return text.split('\n\n')
 
+def extract_passages(documents):
+    pass
+
 def MRR(answers_file, output_file):
     """
     Computes the Mean Reciprocal Rank of the output_file
@@ -91,6 +94,7 @@ def MRR(answers_file, output_file):
         currentRank += 1
     return score/numQuestions
         
+>>>>>>> f2a58847db130fae20c9deb7f2757e772c54d112
 
 def main():
     questions = extract_questions(questions_file)

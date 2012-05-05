@@ -59,7 +59,7 @@ class Question():
         keywords = self.get_keywords()
         return self.reformulate_query(keywords)
     
-    #Create IR database
+    #Create IR database using top 50 docs with tags stripped
     #bgj9
     def index_documents(self):
         # Open the database for update, creating a new database if necessary.
@@ -69,7 +69,7 @@ class Question():
         stemmer = xapian.Stem("english")
         indexer.set_stemmer(stemmer)
         #for each document
-        for doc_string in self.docs.read().split('\n\n'):
+        for doc_string in self.strip_tags( self.docs.read() ).split('\n\n'):
             doc = xapian.Document()
             doc.set_data(doc_string)
             

@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 #from Question import Question
-#import BuildQuery
+import BuildQuery, Question
 import re 
 
 questions_file = "../questions.txt"

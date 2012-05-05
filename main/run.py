@@ -1,12 +1,8 @@
 #! /usr/bin/python
 
-<<<<<<< HEAD
 from Question import Question
 import BuildQuery
-=======
-#from Question import Question
 import BuildQuery, Question
->>>>>>> 89ab4fe064bd5bd04c474d076474e8b4943dbaf5
 import re 
 
 IS_TEST = False

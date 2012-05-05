@@ -48,6 +48,27 @@ class Question():
             docInfoList.append(docInfo)
 
         return docInfoList
+    
+    #splits documents into a list
+    #also removes tags, newlines, tabs, extra spaces
+    def splitByDOC(self):
+        docs = []
+        text = self.docs.read()
+
+        #removes all tags except <DOC>
+        regex = r'<(?!/?DOC\b)[^>]+>'
+        text = re.sub(regex, "", text)
+        
+        #removes newlines and extra spaces
+        text = text.replace('\n', ' ')
+        text = re.sub('[\s\t]+', ' ', text)
+        
+        text = "<documents>" + text + "</documents>"
+        
+        dom = minidom.parseString(text) 
+        for node in dom.getElementsByTagName("DOC"):
+            docs.append(node.firstChild.nodeValue.encode("ascii"))
+        return docs
 
     def get_keywords(self):
         pass
@@ -68,6 +89,7 @@ class Question():
         indexer = xapian.TermGenerator()
         stemmer = xapian.Stem("english")
         indexer.set_stemmer(stemmer)
+        
         #for each document
         for doc_string in self.docs.read().split('\n\n'):
             doc = xapian.Document()

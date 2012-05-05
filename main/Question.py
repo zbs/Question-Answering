@@ -63,6 +63,7 @@ class Question():
     #bgj9
     def index_documents(self):
         # Open the database for update, creating a new database if necessary.
+        print "Going through index_documents"
         database = xapian.WritableDatabase(self.db_directory, xapian.DB_CREATE_OR_OPEN)
         
         indexer = xapian.TermGenerator()

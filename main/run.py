@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
-#from Question import Question
-#import BuildQuery
+from Question import Question
+import BuildQuery
 import re 
 
 questions_file = "../questions.txt"
@@ -114,11 +114,12 @@ def main():
     allDocs = []
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
+        print questions[qNumber]
         question = Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
         query = questions[qNumber]
-        synset = BuildQuery.buildSynset(query, hyponyms=True, hypernyms=False)
+        synset = BuildQuery.buildSynset(query, hyponyms=False, hypernyms=False)
         synset = BuildQuery.trimSynset(query, synset)
         query += " ".join(synset)
         documents = question.search(query)
@@ -176,6 +177,7 @@ def checkIR():
         if "Qid" in output[i][0:9]:
             numDocs += 1
             qID = output[i].split("\t")[0].split(" ")[1]
+            print "Qid is "+qID
             if qID != currentDoc:
                 currentDoc = qID
                 if int(qID) in answersAppear:
@@ -198,8 +200,8 @@ def checkIR():
     return float(numCorrect) / len(answerDocs)
 
 if __name__ == '__main__':
-    #main()
-    print "check"
-    answers = extract_answers(answers_file)
-    for i in answers:
-        print answers[i]
+    main()
+    #print "check"
+    #answers = extract_answers(answers_file)
+    #for i in answers:
+     #   print answers[i]

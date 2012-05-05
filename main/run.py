@@ -1,9 +1,15 @@
 #! /usr/bin/python
 
+<<<<<<< HEAD
+from Question import Question
+import BuildQuery
+=======
 #from Question import Question
-#import BuildQuery
+import BuildQuery, Question
+>>>>>>> 89ab4fe064bd5bd04c474d076474e8b4943dbaf5
 import re 
 
+IS_TEST = False
 questions_file = "../questions.txt"
 answers_file = "../answers.txt"
 DOCS = "../docs/"
@@ -48,11 +54,6 @@ def extract_answers(answers_file):
             answers[qNumber].append(line[:-1])
             answer_in = 1
     return answers
-    
-def extract_documents(filename):
-    with open(filename) as fp:
-        text = fp.read()
-    return text.split('\n\n')
 
 def MRR(answers_file, output_file):
     answers = extract_answers(answers_file)
@@ -114,48 +115,28 @@ def MRR_(answers_file, output_file):
 
 def main():
     questions = extract_questions(questions_file)
-    answers = extract_answers(answers_file)
-    score = 0.0
     output = open(output_file,"w")
-    allDocs = []
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
+        print questions[qNumber]
         question = Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
         query = questions[qNumber]
-        synset = BuildQuery.buildSynset(query, hyponyms=True, hypernyms=False)
+        synset = BuildQuery.buildSynset(query, hyponyms=False, hypernyms=False)
         synset = BuildQuery.trimSynset(query, synset)
         query += " ".join(synset)
-        documents = question.search(query)
-        for (tup, d) in documents:
-            output.write(d)
-        allDocs.append(documents)
-        """
-        guesses = question.run_baseline()
-        for (_,doc,guess) in guesses:
-            if not doc or not guess:
-                doc = "nil"
-                guess = "nil"
-            output.write(str(qNumber) + " " + doc + " " + guess + "\n")
-            print (str(qNumber) + " " + doc + " " + guess)
-        """
+        ir_results = question.search(query)
+        passages = question.golden_passage_retriever(ir_results)
+        top5 = question.top5(passages)
+        for answer in top5:
+            output.write(str(qNumber) + " top_docs." + str(qNumber) + " " + answer + "\n")
     output.close()
-    #mrr = MRR(answers_file, output_file) Errors in MRR? not working.
-    #print "MRR: " + str(mrr)
-    return allDocs
-    '''
-        if answers[qNumber].lower() in guess.lower():
-            score +=1
-            print "got one!"
-            print qNumber
-            print answers[qNumber].lower()
-            print guess.lower()
-    accuracy = score / len(questions)
-    print "Correct Guesses: " + str(score)
-    print "Accuracy: " + str(accuracy)
-    '''
-
+    if not IS_TEST:
+        score = MRR(answers_file,output)
+        print score
+    print "done"
+    
 def checkIR():
     """ Returns proportion of search results that contain the document
     with the answer according to answers.txt """
@@ -182,6 +163,7 @@ def checkIR():
         if "Qid" in output[i][0:9]:
             numDocs += 1
             qID = output[i].split("\t")[0].split(" ")[1]
+            print "Qid is "+qID
             if qID != currentDoc:
                 currentDoc = qID
                 if int(qID) in answersAppear:
@@ -204,8 +186,8 @@ def checkIR():
     return float(numCorrect) / len(answerDocs)
 
 if __name__ == '__main__':
-    #main()
-    print "check"
-    answers = extract_answers(answers_file)
-    for i in answers:
-        print answers[i]
+    main()
+    #print "check"
+    #answers = extract_answers(answers_file)
+    #for i in answers:
+     #   print answers[i]

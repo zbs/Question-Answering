@@ -1,7 +1,6 @@
 #! /usr/bin/python
 
 from Question import Question
-import BuildQuery
 import BuildQuery, Question
 import re 
 
@@ -115,7 +114,7 @@ def main():
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
         print questions[qNumber]
-        question = Question(qNumber,questions[qNumber],docs)
+        question = Question.Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
         query = questions[qNumber]

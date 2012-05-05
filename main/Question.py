@@ -182,7 +182,7 @@ class Question():
                 tokens = word_tokenize(sentence)
                 i = 0
                 while (i < len(tokens)):
-                    passages.append( (ranking, tokens[i : i+WINDOW]) )
+                    passages.append( (" ".join(tokens[i : i+WINDOW]), ranking) )
                     i += WINDOW / 2
         return passages
     

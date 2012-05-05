@@ -1,8 +1,9 @@
 # NOTE, APPARENTLY WE NEED A MORE EFFICIENT WAY OF NE_CHUNKING, THE CURRENT ONE IS TOO SLOW
-import urllib
+import urllib, operator
 import urllib2
 import json
 from nltk import pos_tag, ne_chunk
+WEIGHTS = (1.,1.,1.,1.,1.,1.,1.,1.)
 
 def dict_intersection_length(d1,d2):
     total = 0
@@ -48,21 +49,29 @@ def document_rank(passages_docs, passages):
     return map(lambda x: passages_docs[x], passages)
 
 
-def rank_passages(question, passages, passage_rankings):
+def dot(v1, v2):
+    reduce( operator.add, map( operator.mul, v1, v2))
+    
+def rank_passages(question, passages_tuple, keywords):
     """
+        WORLDS WRST FUNCTON EVR
         passages: list of passages
         passage_rankings: passage --> document origin ranking
         question: obvious
         
         Note: uncomment 
     """
-    rankings = zip(NE_rank(question, passages), num_keywords_rank(question, passages), \
-                   exact_sequence_rank(passages), \
+    passage_rankings, passages = zip(*passages_tuple)
+    rankings = zip(NE_rank(question, passages),
+                   num_keywords_rank(question, passages),
+                   exact_sequence_rank(passages),
                    # Document rank has not been tested yet
-                   document_rank(passage_rankings, passages), \
-                   # These are Declan's metrics -- make sure that they are being called correctly
-                   findAllProximities(passages), getNGramOverlap(passages))
-    return map(lambda x: float(sum(x)) / float(len(x)), rankings)
+                   document_rank(passage_rankings, passages),
+                   findAllProximities(keywords, passages),
+                   getNGramOverlap(keywords, passages, 1),
+                   getNGramOverlap(keywords, passages, 2),
+                   getNGramOverlap(keywords, passages, 3))
+    return sorted(zip ( map(lambda x: dot(x,WEIGHTS), rankings), passages), key = lambda t: -t[0])
 
 
 def findProximity(keywords, passage):

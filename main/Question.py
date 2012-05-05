@@ -4,7 +4,27 @@ from xml.dom import minidom
 import Ranker
 
 WINDOW = 10
+def getStopWords():
+    f = open("../stopWords.txt")
+    words = f.readlines()
+    f.close()
+    words = map(lambda x: x.rstrip("\n"), words)
+    s = set()
+    for w in words:
+        s.add(w)
+    return s
 
+STOP_WORDS = getStopWords()
+
+def getKeyWords(question, stopWords):
+    words = question.split(" ")
+    keywords = []
+    for w in words:
+        if not w in stopWords:
+            keywords.append(w)
+    return keywords
+
+    
 class Question():
     def __init__(self,number,desc,docs):
         self.number = number
@@ -208,5 +228,10 @@ class Question():
     
     def strip_tags(self, doc_string):
         return re.sub("<[^<>]+>", "", doc_string)
+    
+    def top5(self, passages):
+        keywords = getKeyWords(self.desc, STOP_WORDS)
+        return zip(*Ranker.rank_passages(self.desc, passages, keywords)[:5])[1]
+            
 #q = Question(227,0,"../docs/top_docs.227.gz")
 #print (q.golden_passage_retriever(q.search("I think that's great!")))

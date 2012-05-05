@@ -31,17 +31,22 @@ def extract_questions(questions_file):
             isText = False
     return questions
 
-def extract_answers(answers_file, answer_line_no=4):
-    with open(answers_file, 'r') as fp:
-        answer_text = fp.read()
-
+def extract_answers(answers_file):
+    # key: question number
+    # value: answer text
     answers = {}
-    answer_chunks = filter(bool, map(str.strip, answer_text.split('\n\n')))
-    for chunk in answer_chunks:
-        chunk_lines = map(str.strip, chunk.split('\n'))
-        question_no = re.match('^Question (?P<number>[0-9]+)$', \
-                               chunk_lines[0]).group('number')    
-        answers[int(question_no)] = chunk_lines[answer_line_no-1]
+    answer_in = -1
+    for line in open(answers_file):
+        answer_in -= 1
+        if line.startswith("Question"):
+            answer_in = 3
+            qNumber = int(line.split()[-1])
+            answers[qNumber] = []
+        elif line.startswith("\n"):
+            answer_in = -1
+        elif not answer_in:
+            answers[qNumber].append(line[:-1])
+            answer_in = 1
     return answers
     
 def extract_documents(filename):
@@ -57,8 +62,9 @@ def MRR(answers_file, output_file):
     for index, key in enumerate(answers):
         q_answers = output[index * 5: index*6 + 4]
         for rank, q_answer in enumerate(q_answers):
-            cur_answer = answers[key]
-            if q_answer.find(cur_answer) != -1:
+#            cur_answer = answers[key]
+#            if q_answer.find(cur_answer) != -1:
+            if filter(lambda x: q_answer.find(x) != -1, answers[key]):
                 sum_ += 1./float((rank+1))
                 break
     return sum_ / float(len(answers))

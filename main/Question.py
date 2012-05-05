@@ -42,7 +42,8 @@ class Question():
         with gzip.open(self.doc_filename) as fp:
             text = fp.read()
         soup = BeautifulSoup(text)
-        return map(lambda x: x.getText(), soup('doc'))
+        return map(lambda x: re.sub('\t|\s\s+|\n', ' ', x.getText()), \
+                   soup('doc'))
     
     #splits documents into a list
     #also removes tags, newlines, tabs, extra spaces

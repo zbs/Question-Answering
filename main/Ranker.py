@@ -34,6 +34,9 @@ def NE_rank(question, passages):
 
 
 def num_keywords_rank(question, passages):
+    print question
+    print "len passages is %d" %len(passages)
+    print passages[0]
     return map(string_intersection_length , passages, [question]*len(passages))
 
 def exact_sequence_rank(question, passages):
@@ -50,7 +53,7 @@ def document_rank(passages_docs, passages):
 
 
 def dot(v1, v2):
-    reduce( operator.add, map( operator.mul, v1, v2))
+    return reduce( operator.add, map( operator.mul, v1, v2))
     
 def rank_passages(question, passages_tuple, keywords):
     """
@@ -61,17 +64,43 @@ def rank_passages(question, passages_tuple, keywords):
         
         Note: uncomment 
     """
-    passage_rankings, passages = zip(*passages_tuple)
-    rankings = zip(NE_rank(question, passages),
+    """
+    print "passages tuple contains "
+    print passages_tuple[0]
+    passages, passage_rankings = zip(*passages_tuple)
+    print "starting rankings"
+    #ne_rank = NE_rank(question, passages)
+    print "finished NE rank"
+    keywords_rank = num_keywords_rank(question, passages)
+    print "finished keywords rank"
+    exact_sequence = exact_sequence_rank(question, passages)
+    print "finished exact sequence"
+    dictionary = dict(passages_tuple)
+    doc_rank = document_rank(dictionary, passages)
+    print "finished document rank"
+    prox = findAllProximities(keywords, passages)
+    print "finished proximity ranking"
+    oneGram = getNGramOverlap(question, passages, 1)
+    print "finished oneGram"
+    twoGram = getNGramOverlap(question, passages, 2)
+    print "finished twoGram"
+    threeGram = getNGramOverlap(question, passages, 3)
+    print "finished threeGram"
+    """
+    dictionary = dict(passages_tuple)
+    passages, passage_rankings = zip(*passages_tuple)
+    rankings = zip(#NE_rank(question, passages),
                    num_keywords_rank(question, passages),
-                   exact_sequence_rank(passages),
+                   exact_sequence_rank(question, passages),
                    # Document rank has not been tested yet
-                   document_rank(passage_rankings, passages),
+                   document_rank(dictionary, passages),
                    findAllProximities(keywords, passages),
-                   getNGramOverlap(keywords, passages, 1),
-                   getNGramOverlap(keywords, passages, 2),
-                   getNGramOverlap(keywords, passages, 3))
-    return sorted(zip ( map(lambda x: dot(x,WEIGHTS), rankings), passages), key = lambda t: -t[0])
+                   getNGramOverlap(question, passages, 1),
+                   getNGramOverlap(question, passages, 2),
+                   getNGramOverlap(question, passages, 3))
+    print "finished rankings"
+    # Shortened weights while NE_rank is too slow
+    return sorted(zip ( map(lambda x: dot(x,WEIGHTS[1:]), rankings), passages), key = lambda t: -t[0])
 
 
 def findProximity(keywords, passage):
@@ -119,7 +148,7 @@ def findAllProximities(keywords, passages):
     bottom = 1.0
     for p in passages:
         (numWords, totalDistance, allDistances) = findProximity(keywords, p)
-        if numWords != 0:
+        if totalDistance != 0:
             proximityList.append((numWords*top) / (totalDistance*bottom))
         else:
             proximityList.append(0.0)
@@ -168,7 +197,6 @@ def getNGramOverlap(question, passages, n):
     for p in passages:
         words = p.split(" ")
         grams = buildNGrams(words, n)
-        print grams
         count = len(filter(lambda x: x in questionDict, grams))
         overlapList.append(count)
     return overlapList

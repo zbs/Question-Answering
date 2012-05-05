@@ -1,12 +1,7 @@
 #! /usr/bin/python
 
-<<<<<<< HEAD
 from Question import Question
-import BuildQuery
-=======
-#from Question import Question
 import BuildQuery, Question
->>>>>>> 89ab4fe064bd5bd04c474d076474e8b4943dbaf5
 import re 
 
 IS_TEST = False
@@ -119,7 +114,7 @@ def main():
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
         print questions[qNumber]
-        question = Question(qNumber,questions[qNumber],docs)
+        question = Question.Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
         query = questions[qNumber]

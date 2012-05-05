@@ -1,6 +1,7 @@
 import gzip, xapian, re
 from nltk import word_tokenize, pos_tag, ne_chunk, sent_tokenize
 from xml.dom import minidom
+from BeautifulSoup import BeautifulSoup
 import Ranker
 
 WINDOW = 10
@@ -32,63 +33,21 @@ class Question():
         
         # This needs to be initialized correctly
         self.docs = gzip.open(docs)
+        
+        self.doc_filename = docs
         self.db_directory = "../db/db" + str(number)
         self.index_documents()
 
     def getDocumentRelevantInfo(self):
-        """Returns a list of dictionaries, each dictionary corresponding to a document.
-        The keys of the dictionary are the tags of the document.
-        
-        Example code:
-        docInfoList = self.getDocumentRelevantInfo()
-        for docInfo in docInfoList:
-            entry = docInfo["TEXT"] #assuming text should always be in the document
-            if "LEADPARA" in docInfo:
-                entry += docInfo["LEADPARA"]
-            if "HEADLINE" in docInfo:
-                entry += docInfo["HEADLINE"]
-        """
-        docInfoList = []
-        text = self.docs.read()
-        
-        #documents are not well formed XML! why would the TAs give us badly formed XML?
-        text = "<documents>" + text + "</documents>"
-        #removes tags with attributes such as <F P=100> RUSSIA NATIONAL AFFAIRS </F>
-        text = re.sub("<([a-zA-Z0-9]*) [a-zA-Z0-9= ]*>(.*?)</[a-zA-Z0-9]*>", "", text)
-        dom = minidom.parseString(text)
-        
-        for doc in dom.getElementsByTagName("DOC"):
-            docInfo = {}
-            for child in doc.childNodes:
-                tag = child.nodeName.encode("ascii") #normally unicode string?
-                value = "" 
-                for node in child.childNodes:
-                    value += node.toxml().encode("ascii")
-                docInfo[tag] = value
-            docInfoList.append(docInfo)
-
-        return docInfoList
+        with gzip.open(self.doc_filename) as fp:
+            text = fp.read()
+        soup = BeautifulSoup(text)
+        return map(lambda x: x.getText(), soup('doc'))
     
     #splits documents into a list
     #also removes tags, newlines, tabs, extra spaces
     def splitByDOC(self):
-        docs = []
-        text = self.docs.read()
-
-        #removes all tags except <DOC>
-        regex = r'<(?!/?DOC\b)[^>]+>'
-        text = re.sub(regex, "", text)
-        
-        #removes newlines and extra spaces
-        text = text.replace('\n', ' ')
-        text = re.sub('[\s\t]+', ' ', text)
-        
-        text = "<documents>" + text + "</documents>"
-        
-        dom = minidom.parseString(text) 
-        for node in dom.getElementsByTagName("DOC"):
-            docs.append(node.firstChild.nodeValue.encode("ascii"))
-        return docs
+        return self.getDocumentRelevantInfo()
 
     def get_keywords(self):
         pass
@@ -223,7 +182,7 @@ class Question():
                 tokens = word_tokenize(sentence)
                 i = 0
                 while (i < len(tokens)):
-                    passages.append( (ranking, tokens[i : i+WINDOW]) )
+                    passages.append( (" ".join(tokens[i : i+WINDOW]), ranking) )
                     i += WINDOW / 2
         return passages
     

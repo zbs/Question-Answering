@@ -47,12 +47,21 @@ def exact_sequence_rank(question, passages):
 def document_rank(passages_docs, passages):
     return map(lambda x: passages_docs[x], passages)
 
-# passages_docs is a mapping from passages to doc ratings
-def rank_passages(question, passages_docs):
-    passages = passages_docs.keys() 
+
+def rank_passages(question, passages, passage_rankings):
+    """
+        passages: list of passages
+        passage_rankings: passage --> document origin ranking
+        question: obvious
+        
+        Note: uncomment 
+    """
     rankings = zip(NE_rank(question, passages), num_keywords_rank(question, passages), \
-                   exact_sequence_rank(passages))
-#                   document_rank(passages_docs, passages), proximity_rank(passages), ngram_overlap_rank(passages))
+                   exact_sequence_rank(passages), \
+                   # Document rank has not been tested yet
+                   document_rank(passage_rankings, passages), \
+                   # These are Declan's metrics -- make sure that they are being called correctly
+                   findAllProximities(passages), getNGramOverlap(passages))
     return map(lambda x: float(sum(x)) / float(len(x)), rankings)
 
 

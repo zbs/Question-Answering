@@ -1,9 +1,15 @@
 #! /usr/bin/python
 
+<<<<<<< HEAD
 from Question import Question
 import BuildQuery
+=======
+#from Question import Question
+import BuildQuery, Question
+>>>>>>> 89ab4fe064bd5bd04c474d076474e8b4943dbaf5
 import re 
 
+IS_TEST = False
 questions_file = "../questions.txt"
 answers_file = "../answers.txt"
 DOCS = "../docs/"
@@ -31,23 +37,23 @@ def extract_questions(questions_file):
             isText = False
     return questions
 
-def extract_answers(answers_file, answer_line_no=4):
-    with open(answers_file, 'r') as fp:
-        answer_text = fp.read()
-
+def extract_answers(answers_file):
+    # key: question number
+    # value: answer text
     answers = {}
-    answer_chunks = filter(bool, map(str.strip, answer_text.split('\n\n')))
-    for chunk in answer_chunks:
-        chunk_lines = map(str.strip, chunk.split('\n'))
-        question_no = re.match('^Question (?P<number>[0-9]+)$', \
-                               chunk_lines[0]).group('number')    
-        answers[int(question_no)] = chunk_lines[answer_line_no-1]
+    answer_in = -1
+    for line in open(answers_file):
+        answer_in -= 1
+        if line.startswith("Question"):
+            answer_in = 3
+            qNumber = int(line.split()[-1])
+            answers[qNumber] = []
+        elif line.startswith("\n"):
+            answer_in = -1
+        elif not answer_in:
+            answers[qNumber].append(line[:-1])
+            answer_in = 1
     return answers
-    
-def extract_documents(filename):
-    with open(filename) as fp:
-        text = fp.read()
-    return text.split('\n\n')
 
 def MRR(answers_file, output_file):
     answers = extract_answers(answers_file)
@@ -57,8 +63,9 @@ def MRR(answers_file, output_file):
     for index, key in enumerate(answers):
         q_answers = output[index * 5: index*6 + 4]
         for rank, q_answer in enumerate(q_answers):
-            cur_answer = answers[key]
-            if q_answer.find(cur_answer) != -1:
+#            cur_answer = answers[key]
+#            if q_answer.find(cur_answer) != -1:
+            if filter(lambda x: q_answer.find(x) != -1, answers[key]):
                 sum_ += 1./float((rank+1))
                 break
     return sum_ / float(len(answers))
@@ -108,10 +115,7 @@ def MRR_(answers_file, output_file):
 
 def main():
     questions = extract_questions(questions_file)
-    answers = extract_answers(answers_file)
-    score = 0.0
     output = open(output_file,"w")
-    allDocs = []
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
         print questions[qNumber]
@@ -122,35 +126,17 @@ def main():
         synset = BuildQuery.buildSynset(query, hyponyms=False, hypernyms=False)
         synset = BuildQuery.trimSynset(query, synset)
         query += " ".join(synset)
-        documents = question.search(query)
-        for (tup, d) in documents:
-            output.write(d)
-        allDocs.append(documents)
-        """
-        guesses = question.run_baseline()
-        for (_,doc,guess) in guesses:
-            if not doc or not guess:
-                doc = "nil"
-                guess = "nil"
-            output.write(str(qNumber) + " " + doc + " " + guess + "\n")
-            print (str(qNumber) + " " + doc + " " + guess)
-        """
+        ir_results = question.search(query)
+        passages = question.golden_passage_retriever(ir_results)
+        top5 = question.top5(passages)
+        for answer in top5:
+            output.write(str(qNumber) + " top_docs." + str(qNumber) + " " + answer + "\n")
     output.close()
-    #mrr = MRR(answers_file, output_file) Errors in MRR? not working.
-    #print "MRR: " + str(mrr)
-    return allDocs
-    '''
-        if answers[qNumber].lower() in guess.lower():
-            score +=1
-            print "got one!"
-            print qNumber
-            print answers[qNumber].lower()
-            print guess.lower()
-    accuracy = score / len(questions)
-    print "Correct Guesses: " + str(score)
-    print "Accuracy: " + str(accuracy)
-    '''
-
+    if not IS_TEST:
+        score = MRR(answers_file,output)
+        print score
+    print "done"
+    
 def checkIR():
     """ Returns proportion of search results that contain the document
     with the answer according to answers.txt """

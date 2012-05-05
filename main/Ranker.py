@@ -53,7 +53,7 @@ def document_rank(passages_docs, passages):
 
 
 def dot(v1, v2):
-    reduce( operator.add, map( operator.mul, v1, v2))
+    return reduce( operator.add, map( operator.mul, v1, v2))
     
 def rank_passages(question, passages_tuple, keywords):
     """

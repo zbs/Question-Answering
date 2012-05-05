@@ -91,7 +91,7 @@ class Question():
         indexer.set_stemmer(stemmer)
         
         #for each document
-        for doc_string in self.docs.read().split('\n\n'):
+        for doc_string in self.splitByDOC():
             doc = xapian.Document()
             doc.set_data(doc_string)
             

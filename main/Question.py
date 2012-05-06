@@ -1,4 +1,4 @@
-import gzip, xapian, re
+import gzip, xapian, re, string
 from nltk import word_tokenize, pos_tag, ne_chunk, sent_tokenize
 from xml.dom import minidom
 from BeautifulSoup import BeautifulSoup
@@ -6,6 +6,7 @@ import os
 import Ranker
 
 WINDOW = 10
+NUM_DOCS = 10
 def getStopWords():
     f = open("../stopWords.txt")
     words = f.readlines()
@@ -108,7 +109,7 @@ class Question():
     
         # Find the top 10 results for the query.
         enquire.set_query(query)
-        matches = enquire.get_mset(0, 10)
+        matches = enquire.get_mset(0, NUM_DOCS)
     
         # Display the results.
         #print "%i results found." % matches.get_matches_estimated()
@@ -184,6 +185,8 @@ class Question():
         passages = []
         for (ranking, document) in ir_results:
             for sentence in sent_tokenize(document):
+                if sentence == ".":
+                    continue
                 tokens = word_tokenize(sentence)
                 i = 0
                 while (i < len(tokens)):

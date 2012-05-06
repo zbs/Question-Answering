@@ -196,6 +196,9 @@ class Question():
             
     def test(self, passages):
         keywords = getKeyWords(self.desc, STOP_WORDS)
+        print keywords
+        for (p,_) in passages:
+            print p+'\n'
         return Ranker.rank_passages(self.desc, passages, keywords)
             
 #q = Question(227,0,"../docs/top_docs.227.gz")

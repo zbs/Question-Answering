@@ -1,13 +1,13 @@
 #! /usr/bin/python
 
 from Question import Question
-from BuildQuery import buildQuery
+from BuildQuery import buildFullQuery
 
 question = 'Where is Belize located?'
 number = 202
 
 q = Question(number, question, '../docs/top_docs.%d.gz'%number)
-query = buildQuery(question)
+query = buildFullQuery(question, hyponyms=False, hypernyms=False)
 
 documents = q.search(query)
 rankings = q.golden_passage_retriever(documents)

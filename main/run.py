@@ -142,7 +142,7 @@ def justDoIR():
         # Can do baseline here or do full process.
         # Get expanded question:
         query = questions[qNumber]
-        query = BuildQuery.buildFullQuery(query, hyponyms=False, hypernyms=False)
+        query = BuildQuery.buildFullQuery(query, hyponyms=True, hypernyms=True)
         ir_results = question.search(query)
         for (_,answer) in ir_results:
             output.write(answer+"\n")

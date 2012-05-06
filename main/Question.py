@@ -199,7 +199,7 @@ class Question():
             
     def test(self, passages):
         keywords = getKeyWords(self.desc, STOP_WORDS)
-        return Ranker.passage_rankings(self.desc, passages, keywords)
+        return Ranker.rank_passages(self.desc, passages, keywords)
             
 #q = Question(227,0,"../docs/top_docs.227.gz")
 #print (q.golden_passage_retriever(q.search("I think that's great!")))

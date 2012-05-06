@@ -60,34 +60,15 @@ def rank_passages(question, passages_tuple, keywords):
         
         Note: uncomment 
     """
-    """
-    print "passages tuple contains "
-    print passages_tuple[0]
-    passages, passage_rankings = zip(*passages_tuple)
-    print "starting rankings"
-    #ne_rank = NE_rank(question, passages)
-    print "finished NE rank"
-    keywords_rank = num_keywords_rank(question, passages)
-    print "finished keywords rank"
-    exact_sequence = exact_sequence_rank(question, passages)
-    print "finished exact sequence"
-    dictionary = dict(passages_tuple)
-    doc_rank = document_rank(dictionary, passages)
-    print "finished document rank"
-    prox = findAllProximities(keywords, passages)
-    print "finished proximity ranking"
-    oneGram = getNGramOverlap(question, passages, 1)
-    print "finished oneGram"
-    twoGram = getNGramOverlap(question, passages, 2)
-    print "finished twoGram"
-    threeGram = getNGramOverlap(question, passages, 3)
-    print "finished threeGram"
-    """
+    passages_tuple = map(lambda x: (x[0].lower(), x[1]), passages_tuple)
     dictionary = dict(passages_tuple)
     #print (passages_tuple)
     passages, passage_rankings = zip(*passages_tuple)
+    
+    question, keywords = question.lower(), map(str.lower, keywords)
+    
     rankings = zip(#NE_rank(question, passages),
-                   num_keywords_rank(question, passages),
+                   num_keywords_rank(' '.join(keywords), passages),
                    exact_sequence_rank(question, passages),
                    # Document rank has not been tested yet
                    document_rank(dictionary, passages),
@@ -103,16 +84,21 @@ def rank_passages(question, passages_tuple, keywords):
 # This is for testing purposes
 def passage_rankings(question, passages_tuple, keywords):
     """
+        WORLDS WRST FUNCTON EVR
         passages: list of passages
         passage_rankings: passage --> document origin ranking
         question: obvious
         
+        Note: uncomment 
     """
-
+    passages_tuple = map(lambda x: (x[0].lower(), x[1]), passages_tuple)
     dictionary = dict(passages_tuple)
     passages, passage_rankings = zip(*passages_tuple)
+    
+    question, keywords = question.lower(), map(str.lower, keywords)
+    
     rankings = zip(#NE_rank(question, passages),
-                   num_keywords_rank(question, passages),
+                   num_keywords_rank(' '.join(keywords), passages),
                    exact_sequence_rank(question, passages),
                    # Document rank has not been tested yet
                    document_rank(dictionary, passages),
@@ -120,6 +106,7 @@ def passage_rankings(question, passages_tuple, keywords):
                    getNGramOverlap(question, passages, 1),
                    getNGramOverlap(question, passages, 2),
                    getNGramOverlap(question, passages, 3))
+    # Shortened weights while NE_rank is too slow
     return rankings
 
 def findProximity(keywords, passage):

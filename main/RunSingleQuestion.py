@@ -1,13 +1,13 @@
 #! /usr/bin/python
 
 from Question import Question
-from BuildQuery import buildFullQuery
+import BuildQuery
 
 question = 'Where is Belize located?'
 number = 202
 def run_for_question(question, number):
     q = Question(number, question, '../docs/top_docs.%d.gz'%number)
-    query = buildQuery(question)
+    query = BuildQuery.buildQuery(question)
     
     documents = q.search(query)
     rankings = q.golden_passage_retriever(documents)
@@ -15,15 +15,11 @@ def run_for_question(question, number):
     
     return map(lambda x: float(sum(x)) / len(x), zip(*passage_metrics))
 
-<<<<<<< HEAD
-q = Question(number, question, '../docs/top_docs.%d.gz'%number)
-query = buildFullQuery(question, hyponyms=False, hypernyms=False)
+questions = BuildQuery.getQuestions()
+ranking_list = []
+base = 201
+for i in range(0,15):
+    ranking_list.append(run_for_question(questions[i][1], questions[i][0]))
 
-documents = q.search(query)
-rankings = q.golden_passage_retriever(documents)
-passage_metrics = q.test(rankings)
-
-print str(map(lambda x: float(sum(x)) / len(x), zip(*passage_metrics)))
-=======
-print str(run_for_question(question, number))
->>>>>>> 96612d8ae53ab4c03da0eb6cd2becde544da23ae
+avg = map(lambda x: float(sum(x)) / len(x), zip(*ranking_list))
+print avg

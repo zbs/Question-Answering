@@ -41,8 +41,8 @@ class Question():
             self.index_documents()
 
     def getDocumentRelevantInfo(self):
-        with gzip.open(self.doc_filename) as fp:
-            text = fp.read()
+        fp = gzip.open(self.doc_filename)
+        text = fp.read()
         soup = BeautifulSoup(text)
         return map(lambda x: re.sub('\t|\s\s+|\n', ' ', x.getText()), \
                    soup('doc'))
@@ -75,6 +75,7 @@ class Question():
         
         #for each document
         for doc_string in self.splitByDOC():
+            #print doc_string
             doc = xapian.Document()
             doc.set_data(doc_string)
             
@@ -109,8 +110,8 @@ class Question():
         matches = enquire.get_mset(0, 10)
     
         # Display the results.
-        print "%i results found." % matches.get_matches_estimated()
-        print "Results 1-%i:" % matches.size()
+        #print "%i results found." % matches.get_matches_estimated()
+        #print "Results 1-%i:" % matches.size()
         #for m in matches:
         #    print "%i: %i%% docid=%i [%s]" % (m.rank + 1, m.percent, m.docid, m.document.get_data())
         results = []

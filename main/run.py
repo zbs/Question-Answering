@@ -1,8 +1,7 @@
 #! /usr/bin/python
 
-#from Question import Question
-from nltk import word_tokenize
-#import BuildQuery, Question
+from Question import Question
+import BuildQuery
 import re 
 
 IS_TEST = False
@@ -51,10 +50,10 @@ def extract_answers(answers_file):
             answer_in = 1
     return answers
 
-def MRR(answers_file, output_file):
+def MRR():
     answers = extract_answers(answers_file)
-    with open(output_file, 'r') as fp:
-        output = fp.read().split('\n')
+    fp = open(output_file, 'r')
+    output = fp.read().split('\n')
     sum_ = 0.
     for index, key in enumerate(answers):
         q_answers = output[index * 5: index*6 + 4]
@@ -113,21 +112,24 @@ def main():
     questions = extract_questions(questions_file)
     output = open(output_file,"w")
     for qNumber in questions:
+        print "\n"
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
-        print questions[qNumber]
-        question = Question.Question(qNumber,questions[qNumber],docs)
+        #print questions[qNumber]
+        question = Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
         query = BuildQuery.buildFullQuery(questions[qNumber], hyponyms=False, hypernyms=False)
         print query
         ir_results = question.search(query)
+        #print ir_results
         passages = question.golden_passage_retriever(ir_results)
         top5 = question.top5(passages)
         for answer in top5:
+            print answer
             output.write(str(qNumber) + " top_docs." + str(qNumber) + " " + answer + "\n")
     output.close()
     if not IS_TEST:
-        score = MRR(answers_file,output)
+        score = MRR()
         print score
     print "done"
 
@@ -136,7 +138,7 @@ def justDoIR():
     output = open("../IRoutput.txt", 'w')
     for qNumber in questions:
         docs = DOCS + "top_docs." + str(qNumber) + ".gz"
-        question = Question.Question(qNumber,questions[qNumber],docs)
+        question = Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
         query = questions[qNumber]
@@ -195,11 +197,6 @@ def checkIR():
     print answersAppear
     return float(numCorrect) / len(answerDocs)
 
-QWORD_DICT = {"how":lambda str: re.search("\d",str),
-              "when":lambda str: re.search("\d",str),
-              "name":lambda str: str[0] == str[0].upper(),
-              "who":lambda str: str[0] == str[0].upper()}
-
 def analyzeClasses():
     questions = extract_questions(questions_file)
     answers = extract_answers(answers_file)
@@ -234,5 +231,5 @@ def analyzeClasses():
         print q, (float(sum(list))/float(len(list)))
 
 if __name__ == '__main__':
-    main()
-    
+    #main()
+    print MRR()

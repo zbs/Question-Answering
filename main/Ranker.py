@@ -1,9 +1,8 @@
 # NOTE, APPARENTLY WE NEED A MORE EFFICIENT WAY OF NE_CHUNKING, THE CURRENT ONE IS TOO SLOW
 import urllib, operator
-import urllib2
+import urllib2, re
 import json
-from nltk import pos_tag, ne_chunk
-WEIGHTS = (1.,1.,1.,1.,1.,1.,1.,1.)
+WEIGHTS = (2.1, 1.6, 0.018, 90., 2.1, 30.0, 230., 2)
 
 def dict_intersection_length(d1,d2):
     total = 0
@@ -63,6 +62,7 @@ def rank_passages(question, passages_tuple, keywords):
     """
     passages_tuple = map(lambda x: (x[0].lower(), x[1]), passages_tuple)
     dictionary = dict(passages_tuple)
+    #print (passages_tuple)
     passages, passage_rankings = zip(*passages_tuple)
     
     question, keywords = question.lower(), map(str.lower, keywords)
@@ -75,9 +75,10 @@ def rank_passages(question, passages_tuple, keywords):
                    findAllProximities(keywords, passages),
                    getNGramOverlap(question, passages, 1),
                    getNGramOverlap(question, passages, 2),
-                   getNGramOverlap(question, passages, 3))
+                   getNGramOverlap(question, passages, 3),
+                   checkClassConsistency(question,passages))
     # Shortened weights while NE_rank is too slow
-    return sorted(zip ( map(lambda x: dot(x,WEIGHTS[1:]), rankings), passages), key = lambda t: -t[0])
+    return sorted(zip ( map(lambda x: dot(x,WEIGHTS), rankings), passages), key = lambda t: -t[0])
 
 
 # This is for testing purposes
@@ -206,19 +207,19 @@ def getNGramOverlap(question, passages, n):
         overlapList.append(count)
     return overlapList
 
-QWORD_DICT = {"how":lambda str: re.search("\d",str),
-			  "when":lambda str: re.search("\d",str),
-			  "name":lambda str: str[0] == str[0].upper(),
-			  "who":lambda str: str[0] == str[0].upper()}
-	
+QWORD_DICT = {"how":lambda s: re.search("\d",s),
+			  "when":lambda s: re.search("\d",s),
+			  "name":lambda s: s[0] == s[0].upper(),
+			  "who":lambda s: s[0] == s[0].upper()}
+    
 def checkClassConsistency(question,passages):
-	'''
-	Input: the question and a list of passages
-	Output: a binary list where 1 means the passage matches the class 
-	style (i.e. has a number, has a name, etc)
-	'''
-	for qword in QWORD_DICT:
-		if qword in question:
-			break
-	return map(lambda p: 1 if QWORD_DICT[qword](p) else 0,passages)
-		
+    '''
+    Input: the question and a list of passages
+    Output: a binary list where 1 means the passage matches the class 
+    style (i.e. has a number, has a name, etc)
+    '''
+    for qword in QWORD_DICT:
+        if qword in question:
+            break
+    return map(lambda p: 1 if QWORD_DICT[qword](p) else 0,passages)
+        

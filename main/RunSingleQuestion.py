@@ -1,7 +1,11 @@
 #! /usr/bin/python
 
 from Question import Question
+<<<<<<< HEAD
 import BuildQuery
+=======
+from BuildQuery import buildFullQuery
+>>>>>>> f5194df0fabd3c7bdf0cac3fee492bb716af177b
 
 question = 'Where is Belize located?'
 number = 202

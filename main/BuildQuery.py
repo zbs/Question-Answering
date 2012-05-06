@@ -68,7 +68,7 @@ def editSpaces(words):
     newWords = []
     for w in words:
         if "_" in w:
-            w = '\"' + word.replace("_", " "), + '\"'
+            w = '\"' + w.replace("_", " ") + '\"'
         newWords.append(w)
     return newWords
 

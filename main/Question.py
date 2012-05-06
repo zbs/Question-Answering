@@ -43,6 +43,7 @@ class Question():
     def getDocumentRelevantInfo(self):
         fp = gzip.open(self.doc_filename)
         text = fp.read()
+        text = text.replace('</', ' .</')
         soup = BeautifulSoup(text)
         return map(lambda x: re.sub('\t|\s\s+|\n', ' ', x.getText()), \
                    soup('doc'))
@@ -199,7 +200,7 @@ class Question():
             
     def test(self, passages):
         keywords = getKeyWords(self.desc, STOP_WORDS)
-        return Ranker.rank_passages(self.desc, passages, keywords)
+        return Ranker.passage_rankings(self.desc, passages, keywords)
             
 #q = Question(227,0,"../docs/top_docs.227.gz")
 #print (q.golden_passage_retriever(q.search("I think that's great!")))

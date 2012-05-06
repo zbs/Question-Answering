@@ -13,6 +13,6 @@ def run_for_question(question, number):
     rankings = q.golden_passage_retriever(documents)
     passage_metrics = q.test(rankings)
     
-    map(lambda x: float(sum(x)) / len(x), zip(*passage_metrics))
+    return map(lambda x: float(sum(x)) / len(x), zip(*passage_metrics))
 
 print str(run_for_question(question, number))

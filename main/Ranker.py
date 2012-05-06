@@ -98,39 +98,16 @@ def rank_passages(question, passages_tuple, keywords):
     # Shortened weights while NE_rank is too slow
     return sorted(zip ( map(lambda x: dot(x,WEIGHTS[1:]), rankings), passages), key = lambda t: -t[0])
 
-    
-def rank_passages(question, passages_tuple, keywords):
+
+# This is for testing purposes
+def passage_rankings(question, passages_tuple, keywords):
     """
-        WORLDS WRST FUNCTON EVR
         passages: list of passages
         passage_rankings: passage --> document origin ranking
         question: obvious
         
-        Note: uncomment 
     """
-    """
-    print "passages tuple contains "
-    print passages_tuple[0]
-    passages, passage_rankings = zip(*passages_tuple)
-    print "starting rankings"
-    #ne_rank = NE_rank(question, passages)
-    print "finished NE rank"
-    keywords_rank = num_keywords_rank(question, passages)
-    print "finished keywords rank"
-    exact_sequence = exact_sequence_rank(question, passages)
-    print "finished exact sequence"
-    dictionary = dict(passages_tuple)
-    doc_rank = document_rank(dictionary, passages)
-    print "finished document rank"
-    prox = findAllProximities(keywords, passages)
-    print "finished proximity ranking"
-    oneGram = getNGramOverlap(question, passages, 1)
-    print "finished oneGram"
-    twoGram = getNGramOverlap(question, passages, 2)
-    print "finished twoGram"
-    threeGram = getNGramOverlap(question, passages, 3)
-    print "finished threeGram"
-    """
+
     dictionary = dict(passages_tuple)
     passages, passage_rankings = zip(*passages_tuple)
     rankings = zip(#NE_rank(question, passages),

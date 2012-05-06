@@ -200,3 +200,20 @@ def getNGramOverlap(question, passages, n):
         count = len(filter(lambda x: x in questionDict, grams))
         overlapList.append(count)
     return overlapList
+
+QWORD_DICT = {"how":lambda str: re.search("\d",str),
+			  "when":lambda str: re.search("\d",str),
+			  "name":lambda str: str[0] == str[0].upper(),
+			  "who":lambda str: str[0] == str[0].upper()}
+	
+def checkClassConsistency(question,passages):
+	'''
+	Input: the question and a list of passages
+	Output: a binary list where 1 means the passage matches the class 
+	style (i.e. has a number, has a name, etc)
+	'''
+	for qword in QWORD_DICT:
+		if qword in question:
+			break
+	return map(lambda p: 1 if QWORD_DICT[qword](p) else 0,passages)
+		

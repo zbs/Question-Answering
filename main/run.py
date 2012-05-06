@@ -1,7 +1,8 @@
 #! /usr/bin/python
 
-from Question import Question
-import BuildQuery, Question
+#from Question import Question
+from nltk import word_tokenize
+#import BuildQuery, Question
 import re 
 
 IS_TEST = False
@@ -34,7 +35,7 @@ def extract_questions(questions_file):
 
 def extract_answers(answers_file):
     # key: question number
-    # value: answer text
+    # value: list of answer texts
     answers = {}
     answer_in = -1
     for line in open(answers_file):
@@ -180,9 +181,44 @@ def checkIR():
     print answersAppear
     return float(numCorrect) / len(answerDocs)
 
+QWORD_DICT = {"how":lambda str: re.search("\d",str),
+              "when":lambda str: re.search("\d",str),
+              "name":lambda str: str[0] == str[0].upper(),
+              "who":lambda str: str[0] == str[0].upper()}
+
+def analyzeClasses():
+    questions = extract_questions(questions_file)
+    answers = extract_answers(answers_file)
+    qwordsDict = {"how":[],"when":[],"who":[],"name":[]}
+    for id in answers:
+        if "how" in questions[id].lower():
+            for answer in answers[id]:
+                if re.search("\d",answer):
+                    qwordsDict["how"] += [1]
+                else:
+                    qwordsDict["how"] += [0]
+        if "who" in questions[id].lower():
+            for answer in answers[id]:
+                if answer[0] == answer[0].upper():
+                    qwordsDict["who"] += [1]
+                else:
+                    qwordsDict["who"] += [0]
+        if "name" in questions[id].lower():
+            for answer in answers[id]:
+                if answer[0] == answer[0].upper():
+                    qwordsDict["name"] += [1]
+                else:
+                    qwordsDict["name"] += [0]
+        if "when" in questions[id].lower():
+            for answer in answers[id]:
+                if re.search("\d",answer):
+                    qwordsDict["when"] += [1]
+                else:
+                    qwordsDict["when"] += [0]
+    for q in qwordsDict:
+        list = qwordsDict[q]
+        print q, (float(sum(list))/float(len(list)))
+
 if __name__ == '__main__':
     main()
-    #print "check"
-    #answers = extract_answers(answers_file)
-    #for i in answers:
-     #   print answers[i]
+    

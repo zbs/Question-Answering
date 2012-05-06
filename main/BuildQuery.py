@@ -71,7 +71,10 @@ def getQuestions():
     return questions
 
 
-
+def buildQuery(question):
+    stopWords = Question.STOP_WORDS
+    return " ".join(Question.getKeyWords(question, stopWords))
+    
 def buildQueries():
     stopWords = Question.STOP_WORDS
     questions = getQuestions()

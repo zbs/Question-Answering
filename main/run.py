@@ -118,10 +118,8 @@ def main():
         question = Question.Question(qNumber,questions[qNumber],docs)
         # Can do baseline here or do full process.
         # Get expanded question:
-        query = questions[qNumber]
-        synset = BuildQuery.buildSynset(query, hyponyms=False, hypernyms=False)
-        synset = BuildQuery.trimSynset(query, synset)
-        query += " ".join(synset)
+        query = BuildQuery.buildFullQuery(questions[qNumber], hyponyms=False, hypernyms=False)
+        print query
         ir_results = question.search(query)
         passages = question.golden_passage_retriever(ir_results)
         top5 = question.top5(passages)
@@ -132,7 +130,23 @@ def main():
         score = MRR(answers_file,output)
         print score
     print "done"
-    
+
+def justDoIR():
+    questions = extract_questions(questions_file)
+    output = open("../IRoutput.txt", 'w')
+    for qNumber in questions:
+        docs = DOCS + "top_docs." + str(qNumber) + ".gz"
+        question = Question.Question(qNumber,questions[qNumber],docs)
+        # Can do baseline here or do full process.
+        # Get expanded question:
+        query = questions[qNumber]
+        query = BuildQuery.buildFullQuery(query, hyponyms=False, hypernyms=False)
+        ir_results = question.search(query)
+        for (_,answer) in ir_results:
+            output.write(answer+"\n")
+    output.close()
+
+
 def checkIR():
     """ Returns proportion of search results that contain the document
     with the answer according to answers.txt """
@@ -147,7 +161,7 @@ def checkIR():
             correctDoc = answers[i].rstrip('\n')
             answerDocs.append(correctDoc)
     # Check how many questions have the correct document returned
-    f = open("../output.txt")
+    f = open("../IRoutput.txt")
     output = f.readlines()
     f.close()
     currentDoc = ""

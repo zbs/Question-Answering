@@ -2,6 +2,7 @@ import gzip, xapian, re
 from nltk import word_tokenize, pos_tag, ne_chunk, sent_tokenize
 from xml.dom import minidom
 from BeautifulSoup import BeautifulSoup
+import os
 import Ranker
 
 WINDOW = 10
@@ -36,7 +37,8 @@ class Question():
         
         self.doc_filename = docs
         self.db_directory = "../db/db" + str(number)
-        self.index_documents()
+        if not os.path.exists(self.db_directory):
+            self.index_documents()
 
     def getDocumentRelevantInfo(self):
         with gzip.open(self.doc_filename) as fp:
@@ -196,9 +198,6 @@ class Question():
             
     def test(self, passages):
         keywords = getKeyWords(self.desc, STOP_WORDS)
-        print keywords
-        for (p,_) in passages:
-            print p+'\n'
         return Ranker.rank_passages(self.desc, passages, keywords)
             
 #q = Question(227,0,"../docs/top_docs.227.gz")
